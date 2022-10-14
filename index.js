@@ -19,10 +19,10 @@ class MultipleBurnRateCalculator {
     recalculateBurnRates() {
         const slo = parseFloat(this.form.querySelector('#slo').value);
         const sloWindow = parseFloat(this.form.querySelector('#slo_window').value);
-        const errorBudget = 1 - (slo/100);
+        const errorBudget = 1 - (slo / 100);
         const errorThresholds = {};
 
-        for (const humanTime of ['1h', '6h', '1d', '3d']) {
+        for (const humanTime of ['1h', '6h', '1d', '2d', '3d']) {
             const budgetConsuption = parseFloat(this.form.querySelector(`#budget_consumption_${humanTime}`).value);
 
             let [time, kind] = humanTime.split('');
@@ -47,13 +47,14 @@ class MultipleBurnRateCalculator {
         const pagePoints = [];
         const ticketPoints = [];
 
-        for (let i = 0; i<1000; i++) {
+        for (let i = 0; i < 1000; i++) {
             const errorRate = Math.pow(startLog, i * 2);
 
             const detectionTime1h = detectionTime(errorThresholds['1h'], (60 * 1), errorRate);
             const detectionTime6h = detectionTime(errorThresholds['6h'], (60 * 6), errorRate);
             const detectionTime1d = detectionTime(errorThresholds['1d'], (60 * 24), errorRate);
-            const detectionTime3d = detectionTime(errorThresholds['3d'], (60 * 24 * 3),errorRate);
+            const detectionTime2d = detectionTime(errorThresholds['2d'], (60 * 24 * 2), errorRate);
+            const detectionTime3d = detectionTime(errorThresholds['3d'], (60 * 24 * 3), errorRate);
 
             let detectionPage = -1;
             if (detectionTime1h < detectionTime6h && detectionTime1h > -1) {
@@ -66,8 +67,10 @@ class MultipleBurnRateCalculator {
 
             let detectionTicket = -1;
             if (detectionPage === -1) {
-                if (detectionTime1d < detectionTime3d && detectionTime1d > -1) {
+                if (detectionTime1d < detectionTime2d && detectionTime1d > -1) {
                     detectionTicket = detectionTime1d;
+                } else if (detectionTime2d < detectionTime3d && detectionTime2d > -1) {
+                    detectionTicket = detectionTime2d;
                 } else if (detectionTime3d > -1) {
                     detectionTicket = detectionTime3d;
                 }
@@ -85,17 +88,17 @@ class MultipleBurnRateCalculator {
                 title: {
                     text: 'Time',
                 },
-                labels:{
+                labels: {
                     formatter: (event) => {
-                        return Highcharts.dateFormat("%H:%M:%S", new Date(event.value*60*1000));
+                        return Highcharts.dateFormat("%H:%M:%S", new Date(event.value * 60 * 1000));
                     }
                 }
             },
 
             tooltip: {
-                pointFormatter: function(event)  {
-                    const detectionTime = Highcharts.dateFormat("%H:%M:%S", new Date(this.y*60*1000));
-                    return `Detection time: ${detectionTime}<br />Error rate: ${this.x * 100}%` ;
+                pointFormatter: function (event) {
+                    const detectionTime = Highcharts.dateFormat("%H:%M:%S", new Date(this.y * 60 * 1000));
+                    return `Detection time: ${detectionTime}<br />Error rate: ${this.x * 100}%`;
                 },
             },
             xAxis: {
@@ -103,7 +106,7 @@ class MultipleBurnRateCalculator {
                 title: {
                     text: 'Error rate',
                 },
-                labels:{
+                labels: {
                     formatter: (event) => {
                         return (event.value * 100) + '%';
                     }
