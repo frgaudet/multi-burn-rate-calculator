@@ -65,7 +65,7 @@ class MultipleBurnRateCalculator {
             pagePoints.push([errorRate, detectionPage]);
 
             let detectionTicket = -1;
-            if (detectionPage === -1) {
+            if (detectionTicket === -1) {
                 if (detectionTime1d < detectionTime2d && detectionTime1d > -1) {
                     detectionTicket = detectionTime1d;
                 } else if (detectionTime2d > -1) {
