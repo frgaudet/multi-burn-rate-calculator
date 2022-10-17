@@ -63,7 +63,7 @@ class MultipleBurnRateCalculator {
 
             let detectionTicket = -1;
             if (detectionTicket === -1) {
-                if (detectionTime6h < detectionTime2d && detectionTime6h > -1) {
+                if (detectionTime6h < detectionTime2d && detectionTime6h > -1 && detectionTime6h > detectionTime1h) {
                     detectionTicket = detectionTime6h;
                 } else if (detectionTime2d > -1) {
                     detectionTicket = detectionTime2d;
