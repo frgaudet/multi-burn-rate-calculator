@@ -22,7 +22,7 @@ class MultipleBurnRateCalculator {
         const errorBudget = 1 - (slo / 100);
         const errorThresholds = {};
 
-        for (const humanTime of ['1h', '6h', '1d', '2d']) {
+        for (const humanTime of ['1h', '6h', '2d']) {
             const budgetConsuption = parseFloat(this.form.querySelector(`#budget_consumption_${humanTime}`).value);
 
             let [time, kind] = humanTime.split('');
@@ -52,22 +52,19 @@ class MultipleBurnRateCalculator {
 
             const detectionTime1h = detectionTime(errorThresholds['1h'], (60 * 1), errorRate);
             const detectionTime6h = detectionTime(errorThresholds['6h'], (60 * 6), errorRate);
-            const detectionTime1d = detectionTime(errorThresholds['1d'], (60 * 24), errorRate);
             const detectionTime2d = detectionTime(errorThresholds['2d'], (60 * 24 * 2), errorRate);
 
             let detectionPage = -1;
             if (detectionTime1h < detectionTime6h && detectionTime1h > -1) {
                 detectionPage = detectionTime1h;
-            } else if (detectionTime6h > -1) {
-                detectionPage = detectionTime6h;
             }
 
             pagePoints.push([errorRate, detectionPage]);
 
             let detectionTicket = -1;
             if (detectionTicket === -1) {
-                if (detectionTime1d < detectionTime2d && detectionTime1d > -1) {
-                    detectionTicket = detectionTime1d;
+                if (detectionTime6h < detectionTime2d && detectionTime6h > -1) {
+                    detectionTicket = detectionTime6h;
                 } else if (detectionTime2d > -1) {
                     detectionTicket = detectionTime2d;
                 }
